@@ -23,7 +23,11 @@ void BallClass::createBall(Adafruit_SSD1306 &display) {
     display.display();
 }
 
+//This is a new comment to check if my workingbranch is working
+
 void BallClass::moveBall(Adafruit_SSD1306 &display, PaddleClass homePaddle, PaddleClass awayPaddle){
+    int vv = 5;
+    vv = vv+1;
     if (_t > _delay){
         _xPos = _prevXPos + _xVel;
         _yPos = _prevYPos + _yVel;
