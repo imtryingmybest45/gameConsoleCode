@@ -7,61 +7,60 @@
 #include <Adafruit_SSD1306.h>
 
 // Constructor implementation
-PaddleClass::PaddleClass(int homePaddle, Adafruit_SSD1306& display): _display(display) {
+PaddleClass::PaddleClass(Adafruit_SSD1306& display, int homePaddle): _display(display) {
   _homePaddle = homePaddle;        // Store the provided pin number in the private variable
   _display = display;
   if (_homePaddle == 1){
     _xRangeMin = 4;
   }
   else{
-    _xRangeMin = 119;
+    _xRangeMin = display.width()-9;
   }
-  _xRangeMax = _xRangeMin + _paddleWidth;
+  if (_paddleWidth % 2 != 0){
+      _paddleWidth = _paddleWidth + 1;
+   }
+    if (_paddleLength % 2 != 0){
+      _paddleLength = _paddleLength + 1;
+   }
+   _xRangeMax = _xRangeMin + _paddleWidth;
+   _yRangeMin = display.height()/2 - _paddleLength/2;
+   _yRangeMax = display.height()/2 + _paddleLength/2;
+   _activeCols = (_paddleLength > _MAX_COLUMNS) ? _MAX_COLUMNS : _paddleLength;
+   _paddlePos[_activeCols];
+
 }
 
 void PaddleClass::createPaddle(Adafruit_SSD1306 &display) {
-    int xRangeMin;
-    int xRangeMax;
-    int yRangeMin = (int)round(32 - _paddleLength/2);
-    int yRangeMax = (int)round(32 + _paddleLength/2);
-    if (_homePaddle == 1){
-        xRangeMin = 4;
-    }
-    else{
-        xRangeMin = 119;
-    }
-    xRangeMax = xRangeMin + _paddleWidth;
-    for (int x = xRangeMin; x < xRangeMax; x++){
-        for (int y = yRangeMin; y <= yRangeMax; y++) {
-            display.drawPixel(x, y, SSD1306_WHITE);
-        }
-    }
+    drawPaddle(display, 0, 1);
     display.display();
-    _yPos = yRangeMin + (int)round((_paddleLength)/2);
 }
 
 void PaddleClass::movePaddleDown(Adafruit_SSD1306 &display) {
-    if (_yPos + _paddleLength/2 < 60){
-        for (int x = _xRangeMin; x < _xRangeMax; x++){
-            display.drawPixel(x, _yPos - (_paddleLength/2),SSD1306_BLACK);
-            display.drawPixel(x, _yPos - (_paddleLength/2)+1,SSD1306_BLACK);
-            display.drawPixel(x, _yPos + (_paddleLength/2)+1,SSD1306_WHITE);
-            display.drawPixel(x, _yPos + (_paddleLength/2)+2,SSD1306_WHITE);
-        }
-        display.display();
-        _yPos = _yPos + 2;
-    }
+    drawPaddle(display, 0, 0);
+    drawPaddle(display, 2, 1);
+    display.display();
 }
 
 void PaddleClass::movePaddleUp(Adafruit_SSD1306 &display) {
-    if (_yPos - _paddleLength/2 > 3){
-        for (int x = _xRangeMin; x < _xRangeMax; x++){
-            display.drawPixel(x, _yPos + (_paddleLength/2),SSD1306_BLACK);
-            display.drawPixel(x, _yPos + (_paddleLength/2)-1,SSD1306_BLACK);
-            display.drawPixel(x, _yPos - (_paddleLength/2)-1,SSD1306_WHITE);
-            display.drawPixel(x, _yPos - (_paddleLength/2)-2,SSD1306_WHITE);
+    drawPaddle(display, 0, 0);
+    drawPaddle(display, -2, 1);
+    display.display();
+}
+
+void PaddleClass::drawPaddle(Adafruit_SSD1306 &display, int yInc, int color){
+    _yRangeMin = _yRangeMin + yInc;
+    _yRangeMax = _yRangeMax + yInc;
+    int yInd = 0;
+    for (int x = _xRangeMin; x < _xRangeMax; x++){
+        for (int y = _yRangeMin; y <= _yRangeMax; y++) {
+            if (color == 1){
+                display.drawPixel(x, y, SSD1306_WHITE);
+                _paddlePos[yInd] = y;
+            }
+            else{
+                display.drawPixel(x, y, SSD1306_BLACK);
+            }
+            yInd++;
         }
-        display.display();
-        _yPos = _yPos - 2;
     }
 }

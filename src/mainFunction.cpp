@@ -61,8 +61,8 @@ int switchStateD = 0;
 TextFunctions txtFuncs(100, 5, 32, display);
 MenuClass menu(100, 5, 32, display);
 PongClass pong(display);
-PaddleClass awayPaddle(0, display);
-PaddleClass homePaddle(1, display);
+PaddleClass awayPaddle(display, 0);
+PaddleClass homePaddle(display, 1);
 BallClass ball(display);
 int pongMode = 0;
 
@@ -136,16 +136,14 @@ void loop(){
   switchStateD = digitalRead(12);
   switchStateV = digitalRead(13);
 
-    if (pongMode == 1){
-        ball.moveBall(display, homePaddle, awayPaddle);
-    }
-
     if (switchStateV == 1){
        menuFunc(menu, display);
        if (pongMode == 1){
             pong.gameStartup(display);
             homePaddle.createPaddle(display);
+            Serial.println(homePaddle._paddlePos[0]);
             awayPaddle.createPaddle(display);
+            Serial.println(awayPaddle._paddlePos[0]);
             ball.createBall(display);
        }
     }
@@ -161,19 +159,26 @@ void loop(){
         if (pongMode == 1){
             homePaddle.movePaddleUp(display);
         }
-        delay(300);
+        delay(3);
     }
 
     if (switchStateS == 1){
         if (pongMode == 1){
             homePaddle.movePaddleDown(display);
+            delay(3);
         }
         else{
             menu.menuDown(display);
+            delay(300);
         }
-        delay(300);
     }
 
     if (switchStateD == 1){
     }
+
+    if (pongMode == 1){
+        ball.moveBall(display, homePaddle, awayPaddle);
+    }
+
+
 }

@@ -19,13 +19,19 @@ class PaddleClass {
     int _yPos = 0;
     int _xRangeMin;
     int _xRangeMax;
-    int _paddlePos[2][12];
+    int _yRangeMin;
+    int _yRangeMax;
+    const static int _MAX_COLUMNS = 24;
+    int _paddlePos[_MAX_COLUMNS];
+    int _activeRows;
+    int _activeCols;
 
-    PaddleClass(int homePaddle, Adafruit_SSD1306& display); 
+    PaddleClass(Adafruit_SSD1306& display, int homePaddle); 
 
     void createPaddle(Adafruit_SSD1306& display);
     void movePaddleDown(Adafruit_SSD1306& display);
     void movePaddleUp(Adafruit_SSD1306& display);
+    void drawPaddle(Adafruit_SSD1306& display, int yInc, int color);
 };
 
 #endif

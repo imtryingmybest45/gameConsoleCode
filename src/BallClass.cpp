@@ -10,12 +10,56 @@
 // Constructor implementation
 BallClass::BallClass(Adafruit_SSD1306& display): _display(display) {
   _display = display;
+  _xPos = display.width()/2;
+  _yPos = display.height()/2;
+  _prevXPos = _xPos;
+  _prevYPos = _yPos;
 
+}
+
+void BallClass::drawBall(Adafruit_SSD1306 &display, int color, PaddleClass &homePaddle, PaddleClass &awayPaddle){
+    int badPixel = 0;
+    for (int x = _xPos-1; x <= _xPos; x++){
+        for (int y = _yPos-1; y <= _yPos; y++){
+            if (color == 0){
+                if (_xVel > 0){
+                    for (int iy = 0; iy < awayPaddle._paddleLength; iy++){
+                        if (x == awayPaddle._xRangeMin && y == awayPaddle._paddlePos[iy]){
+                            badPixel = 1;
+                            break;
+                        }
+                    }
+                    if (badPixel){
+                        break;
+                    }
+                    else{
+                        display.drawPixel(x,y,SSD1306_BLACK);
+                        }
+                    }
+                else{
+                    for (int iy = 0; iy < homePaddle._paddleLength; iy++){
+                        if (x == homePaddle._xRangeMax-1 && y == homePaddle._paddlePos[iy]){
+                            badPixel = 1;
+                            break;
+                        }
+                    }
+                    if (badPixel){
+                        break;
+                    }
+                    else{
+                        display.drawPixel(x,y,SSD1306_BLACK);
+                    }
+                }
+            }
+            else{
+                display.drawPixel(x, y, SSD1306_WHITE);
+            }
+        }
+    }
 }
 
 void BallClass::createBall(Adafruit_SSD1306 &display) {
     for (int x = _xPos-1; x <= _xPos; x++){
-
         for (int y = _yPos-1; y <= _yPos; y++){
             display.drawPixel(x, y, SSD1306_WHITE);
         }
@@ -25,68 +69,48 @@ void BallClass::createBall(Adafruit_SSD1306 &display) {
 
 //This is a new comment to check if my workingbranch is working
 
-void BallClass::moveBall(Adafruit_SSD1306 &display, PaddleClass homePaddle, PaddleClass awayPaddle){
-    int vv = 5;
-    vv = vv+1;
-    if (_t > _delay){
+void BallClass::moveBall(Adafruit_SSD1306 &display, PaddleClass &homePaddle, PaddleClass &awayPaddle){
+    if (_t >= _delay){
+        _t = 0;
+        drawBall(display, 0, homePaddle, awayPaddle);
         _xPos = _prevXPos + _xVel;
         _yPos = _prevYPos + _yVel;
-        _t = 0;
-        for (int x = _prevXPos-1; x <= _prevXPos; x++){
-            for (int y = _prevYPos-1; y <= _prevYPos; y++){
-                if (!display.getPixel(x + _xVel, y)){
-                    display.drawPixel(x, y, SSD1306_BLACK);
+       drawBall(display, 1, homePaddle, awayPaddle);
+        _prevXPos = _xPos;
+        _prevYPos = _yPos;
+        if (_xPos == awayPaddle._xRangeMin-1){
+            /*for (int iy = 0; iy <= awayPaddle._paddleLength; iy++){
+                //if (_yPos == awayPaddle._paddlePos[iy][1]){
+                if (_yPos == awayPaddle._paddlePos[iy]){
+                    _xVel = -_xVel;
+                    break;
                 }
-            }
+            }*/
+           _xVel = -_xVel;
         }
-        // clean the below lines up
-        if (_yVel == 1){
-            for (int x = _prevXPos; x <= _prevXPos+1; x++){
-                for (int y = _prevYPos-1; y <= _prevYPos+1; y++){
-                    display.drawPixel(x, y, SSD1306_BLACK);
-                }
-            }
-        }
-        else if (_yVel == -1){
-            for (int x = _prevXPos; x <= _prevXPos+1; x++){
-                for (int y = _prevYPos-1; y <= _prevYPos+1; y++){
-                    display.drawPixel(x, y, SSD1306_BLACK);
-                }
-            }
-        }
-        // clean the above lines up
-        if (_xPos >= 118){
-            if (_yPos <= awayPaddle._yPos + awayPaddle._paddleLength/2 && _yPos >= awayPaddle._yPos - awayPaddle._paddleLength/2){
-                _xVel = -_xVel;
-            }
-        }
-        else if (_xPos <= 6){
-            if (_yPos <= homePaddle._yPos + homePaddle._paddleLength/2 && _yPos >= homePaddle._yPos - homePaddle._paddleLength/2){
-                _xVel = -_xVel;
-                if (_yPos >= homePaddle._yPos + homePaddle._paddleLength/2 - 2){
-                    _yVel = 1;
-                }
-                else if (_yPos <= homePaddle._yPos - homePaddle._paddleLength/2 + 2){
-                    _yVel = -1;
-                }
-                else{
-                    _yVel = 0;
+        else if (_xPos == homePaddle._xRangeMax+1){
+            for (int iy = 0; iy <= homePaddle._paddleLength; iy++){
+                if (_yPos == homePaddle._paddlePos[iy]){
+                    if (iy < homePaddle._paddleLength/2 - 1){
+                        _yVel = -1;
+                    }
+                    else if (iy > awayPaddle._paddleLength/2 + 1){
+                        _yVel = 1;
+                    }
+                    else{
+                        _yVel = 0;
+                    }
+                    _xVel = -_xVel;
+                    break;
                 }
             }
         }
         if (_yPos <= 1){
             _yVel = 1;
         }
-        else if (_yPos >= 64){
+        else if (_yPos >= display.height()){
             _yVel = -1;
         }
-        for (int x = _xPos-1; x <= _xPos; x++){
-            for (int y = _yPos-1; y <= _yPos; y++){
-                display.drawPixel(x, y, SSD1306_WHITE);
-            }
-        }
-        _prevXPos = _xPos;
-        _prevYPos = _yPos;
     }
     else{
         _t = _t + 1;

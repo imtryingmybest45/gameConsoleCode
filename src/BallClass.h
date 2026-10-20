@@ -14,11 +14,11 @@ class BallClass {
 
   public:
     // Constructor: Runs automatically when a class instance is created
-    int _xPos = 64;
-    int _yPos = 32;
-    int _prevXPos = _xPos;
-    int _prevYPos = _yPos;
-    int _xVel = 2;
+    int _xPos;
+    int _yPos;
+    int _prevXPos;
+    int _prevYPos;
+    int _xVel = -1;
     int _yVel = 0;
     int _t = 0;
     int _delay = 0;
@@ -26,7 +26,8 @@ class BallClass {
     BallClass(Adafruit_SSD1306& display); 
 
     void createBall(Adafruit_SSD1306& display);
-    void moveBall(Adafruit_SSD1306& display, PaddleClass homePaddle, PaddleClass awayPaddle);
+    void moveBall(Adafruit_SSD1306& display, PaddleClass &homePaddle, PaddleClass &awayPaddle);
+    void drawBall(Adafruit_SSD1306& display, int color, PaddleClass &homePaddle, PaddleClass &awayPaddle);
 };
 
 #endif
