@@ -14,11 +14,8 @@ class PaddleClass {
 
   public:
     // Constructor: Runs automatically when a class instance is created
-    int _paddleWidth = 2;
     int _paddleLength = 12;
-    int _yPos = 0;
-    int _xRangeMin;
-    int _xRangeMax;
+    int _xPos = 0;
     int _yRangeMin;
     int _yRangeMax;
     const static int _MAX_COLUMNS = 24;
@@ -29,8 +26,8 @@ class PaddleClass {
     PaddleClass(Adafruit_SSD1306& display, int homePaddle); 
 
     void createPaddle(Adafruit_SSD1306& display);
-    void movePaddleDown(Adafruit_SSD1306& display);
-    void movePaddleUp(Adafruit_SSD1306& display);
+    void movePaddleDown(Adafruit_SSD1306& display, int yInc);
+    void movePaddleUp(Adafruit_SSD1306& display, int yInc);
     void drawPaddle(Adafruit_SSD1306& display, int yInc, int color);
 };
 

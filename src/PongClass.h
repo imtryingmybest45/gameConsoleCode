@@ -6,6 +6,8 @@
 #include <Wire.h>
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
+#include <PaddleClass.h>
+#include <BallClass.h>
 
 class PongClass {
   private:
@@ -20,6 +22,7 @@ class PongClass {
 
     void gameStartup(Adafruit_SSD1306& display);
     void createScoreboard(Adafruit_SSD1306& display);
+    void resetGame(Adafruit_SSD1306& display, PaddleClass &homePaddle, PaddleClass &awayPaddle, BallClass &ball);
 };
 
 #endif

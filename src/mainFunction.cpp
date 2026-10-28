@@ -63,7 +63,7 @@ MenuClass menu(100, 5, 32, display);
 PongClass pong(display);
 PaddleClass awayPaddle(display, 0);
 PaddleClass homePaddle(display, 1);
-BallClass ball(display);
+BallClass ball(display, -1);
 int pongMode = 0;
 
 
@@ -141,15 +141,14 @@ void loop(){
        if (pongMode == 1){
             pong.gameStartup(display);
             homePaddle.createPaddle(display);
-            Serial.println(homePaddle._paddlePos[0]);
             awayPaddle.createPaddle(display);
-            Serial.println(awayPaddle._paddlePos[0]);
             ball.createBall(display);
        }
     }
 
     if (switchStateA == 1){
         pongMode = 0;
+        pong.resetGame(display, homePaddle, awayPaddle, ball);
         display.clearDisplay();
         menu.displayMenu(display);
         delay(300);
@@ -157,15 +156,13 @@ void loop(){
 
     if (switchStateW == 1){
         if (pongMode == 1){
-            homePaddle.movePaddleUp(display);
+            homePaddle.movePaddleUp(display, -2);
         }
-        delay(3);
     }
 
     if (switchStateS == 1){
         if (pongMode == 1){
-            homePaddle.movePaddleDown(display);
-            delay(3);
+            homePaddle.movePaddleDown(display, 2);
         }
         else{
             menu.menuDown(display);
@@ -178,6 +175,29 @@ void loop(){
 
     if (pongMode == 1){
         ball.moveBall(display, homePaddle, awayPaddle);
+        int middle = awayPaddle._paddleLength/2;
+        int randInt = random(3,8);
+        int topYRangeMin = awayPaddle._paddlePos[middle-2];
+        int topYRangeMax = awayPaddle._paddlePos[middle-2] - randInt;
+        int botYRangeMin = awayPaddle._paddlePos[middle+2];
+        int botYRangeMax = awayPaddle._paddlePos[middle+2] + randInt;
+        if (ball._xPos > SCREEN_WIDTH/2){
+            if (ball._yPos <= topYRangeMin && ball._yPos >= topYRangeMax){
+                awayPaddle.movePaddleUp(display, -1);
+            }
+            else if (ball._yPos >= botYRangeMin && ball._yPos <= botYRangeMax){
+                awayPaddle.movePaddleDown(display, 1);
+            }
+        }
+        if (ball._xPos < 0 || ball._xPos > SCREEN_WIDTH){
+            pong.resetGame(display, homePaddle, awayPaddle, ball);
+            display.clearDisplay();
+            display.display();
+            delay(1000);
+            homePaddle.createPaddle(display);
+            awayPaddle.createPaddle(display);
+            ball.createBall(display);
+        }
     }
 
 

@@ -18,12 +18,12 @@ class BallClass {
     int _yPos;
     int _prevXPos;
     int _prevYPos;
-    int _xVel = -1;
+    int _xVel;
     int _yVel = 0;
     int _t = 0;
     int _delay = 0;
 
-    BallClass(Adafruit_SSD1306& display); 
+    BallClass(Adafruit_SSD1306& display, int xVel); 
 
     void createBall(Adafruit_SSD1306& display);
     void moveBall(Adafruit_SSD1306& display, PaddleClass &homePaddle, PaddleClass &awayPaddle);
