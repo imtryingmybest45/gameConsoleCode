@@ -61,10 +61,11 @@ int switchStateD = 0;
 TextFunctions txtFuncs(100, 5, 32, display);
 MenuClass menu(100, 5, 32, display);
 PongClass pong(display);
-PaddleClass awayPaddle(0, display);
-PaddleClass homePaddle(1, display);
-BallClass ball(display);
+PaddleClass awayPaddle(display, 0);
+PaddleClass homePaddle(display, 1);
+BallClass ball(display, -1);
 int pongMode = 0;
+int onFlag = 1;
 
 
 void setup()  {
@@ -136,10 +137,6 @@ void loop(){
   switchStateD = digitalRead(12);
   switchStateV = digitalRead(13);
 
-    if (pongMode == 1){
-        ball.moveBall(display, homePaddle, awayPaddle);
-    }
-
     if (switchStateV == 1){
        menuFunc(menu, display);
        if (pongMode == 1){
@@ -152,6 +149,7 @@ void loop(){
 
     if (switchStateA == 1){
         pongMode = 0;
+        pong.resetGame(display, homePaddle, awayPaddle, ball);
         display.clearDisplay();
         menu.displayMenu(display);
         delay(300);
@@ -159,21 +157,51 @@ void loop(){
 
     if (switchStateW == 1){
         if (pongMode == 1){
-            homePaddle.movePaddleUp(display);
+            homePaddle.movePaddleUp(display, 2);
         }
-        delay(300);
     }
 
     if (switchStateS == 1){
         if (pongMode == 1){
-            homePaddle.movePaddleDown(display);
+            homePaddle.movePaddleDown(display, 2);
         }
         else{
             menu.menuDown(display);
+            delay(300);
         }
-        delay(300);
     }
 
     if (switchStateD == 1){
+        if (onFlag == 1){
+            display.clearDisplay();
+            display.display();
+            onFlag = 0;
+            pongMode = 0;
+            pong.resetGame(display, homePaddle, awayPaddle, ball);
+            delay(500);
+        }
+       else{
+            txtFuncs.drawCenteredText("Welcome to my gaming console.",display);
+            delay(2000);
+            display.clearDisplay();
+            menu.displayMenu(display);
+            onFlag = 1;
+        }
     }
+
+    if (pongMode == 1){
+        ball.moveBall(display, homePaddle, awayPaddle);
+        awayPaddle.moveAwayPaddle(display, ball);
+        if (ball._xPos < 0 || ball._xPos > SCREEN_WIDTH){
+            pong.resetGame(display, homePaddle, awayPaddle, ball);
+            display.clearDisplay();
+            display.display();
+            delay(1000);
+            homePaddle.createPaddle(display);
+            awayPaddle.createPaddle(display);
+            ball.createBall(display);
+        }
+    }
+
+
 }
