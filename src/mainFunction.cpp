@@ -65,6 +65,7 @@ PaddleClass awayPaddle(display, 0);
 PaddleClass homePaddle(display, 1);
 BallClass ball(display, -1);
 int pongMode = 0;
+int onFlag = 1;
 
 
 void setup()  {
@@ -156,7 +157,7 @@ void loop(){
 
     if (switchStateW == 1){
         if (pongMode == 1){
-            homePaddle.movePaddleUp(display, -2);
+            homePaddle.movePaddleUp(display, 2);
         }
     }
 
@@ -171,24 +172,26 @@ void loop(){
     }
 
     if (switchStateD == 1){
+        if (onFlag == 1){
+            display.clearDisplay();
+            display.display();
+            onFlag = 0;
+            pongMode = 0;
+            pong.resetGame(display, homePaddle, awayPaddle, ball);
+            delay(500);
+        }
+       else{
+            txtFuncs.drawCenteredText("Welcome to my gaming console.",display);
+            delay(2000);
+            display.clearDisplay();
+            menu.displayMenu(display);
+            onFlag = 1;
+        }
     }
 
     if (pongMode == 1){
         ball.moveBall(display, homePaddle, awayPaddle);
-        int middle = awayPaddle._paddleLength/2;
-        int randInt = random(3,8);
-        int topYRangeMin = awayPaddle._paddlePos[middle-2];
-        int topYRangeMax = awayPaddle._paddlePos[middle-2] - randInt;
-        int botYRangeMin = awayPaddle._paddlePos[middle+2];
-        int botYRangeMax = awayPaddle._paddlePos[middle+2] + randInt;
-        if (ball._xPos > SCREEN_WIDTH/2){
-            if (ball._yPos <= topYRangeMin && ball._yPos >= topYRangeMax){
-                awayPaddle.movePaddleUp(display, -1);
-            }
-            else if (ball._yPos >= botYRangeMin && ball._yPos <= botYRangeMax){
-                awayPaddle.movePaddleDown(display, 1);
-            }
-        }
+        awayPaddle.moveAwayPaddle(display, ball);
         if (ball._xPos < 0 || ball._xPos > SCREEN_WIDTH){
             pong.resetGame(display, homePaddle, awayPaddle, ball);
             display.clearDisplay();
