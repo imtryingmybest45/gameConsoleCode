@@ -29,7 +29,7 @@ PaddleClass::PaddleClass(Adafruit_SSD1306& display, int homePaddle): _display(di
 
 void PaddleClass::createPaddle(Adafruit_SSD1306 &display) {
     drawPaddle(display, 0, 1);
-    display.display();
+    //display.display();
 }
 
 void PaddleClass::movePaddleDown(Adafruit_SSD1306 &display, int yinc) {
@@ -79,7 +79,7 @@ void PaddleClass::moveAwayPaddle(Adafruit_SSD1306 &display, BallClass &ball){
     else if (ball._xVel > 0 && (ball._xPos == endTracking || ball._xPos-1 == endTracking) && _calcFlag){
         _counter = 0;
         _t = 0;
-        int t = _xPos - endTracking;
+        int t = floor((_xPos - endTracking)/abs(ball._xVel));
         int y0 = ball._yPos;
         int y;
         int vy = ball._yVel;
@@ -91,9 +91,19 @@ void PaddleClass::moveAwayPaddle(Adafruit_SSD1306 &display, BallClass &ball){
             }
             y0 = y;
         }
+        /*if (y < _paddlePos[0]){
+            _delt = _paddlePos[0] - y;
+        }
+        else if (y > _paddlePos[_paddleLength-1]){
+            _delt = _paddlePos[_paddleLength-1] - y;
+        }
+        else{
+            _delt = _paddlePos[_paddleLength/2] - y;
+        }*/
         _delt = _paddlePos[_paddleLength/2] - y;
         _paddleVel = 2;
         _counter = floor(abs(_delt)/_paddleVel)-randInt;
+        //_counter = floor(abs(_delt/_paddleVel));
         _calcFlag = 0;
     }
     else if (ball._xVel > 0 && ball._xPos >= endTracking){

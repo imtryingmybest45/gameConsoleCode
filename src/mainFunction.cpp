@@ -150,6 +150,8 @@ void loop(){
     if (switchStateA == 1){
         pongMode = 0;
         pong.resetGame(display, homePaddle, awayPaddle, ball);
+        pong._homeScore = 0;
+        pong._awayScore = 0;
         display.clearDisplay();
         menu.displayMenu(display);
         delay(300);
@@ -178,6 +180,8 @@ void loop(){
             onFlag = 0;
             pongMode = 0;
             pong.resetGame(display, homePaddle, awayPaddle, ball);
+            pong._homeScore = 0;
+            pong._awayScore = 0;
             delay(500);
         }
        else{
@@ -193,10 +197,31 @@ void loop(){
         ball.moveBall(display, homePaddle, awayPaddle);
         awayPaddle.moveAwayPaddle(display, ball);
         if (ball._xPos < 0 || ball._xPos > SCREEN_WIDTH){
+            if (ball._xPos < 0){
+                pong._awayScore = pong._awayScore+1;
+            }
+            else{
+                pong._homeScore = pong._homeScore+1;
+            }
+            pong.createScoreboard(display);
+            display.display();
+            delay(1500);
+            if(pong._homeScore == 7 || pong._awayScore == 7){
+                if (pong._homeScore == 7){
+                    txtFuncs.drawCenteredText("You win!",display);
+                    delay(1500);
+                }
+                else{
+                    txtFuncs.drawCenteredText("You lose!",display);
+                    delay(1500);
+                }
+                pong._homeScore = 0;
+                pong._awayScore = 0;
+            }
             pong.resetGame(display, homePaddle, awayPaddle, ball);
             display.clearDisplay();
             display.display();
-            delay(1000);
+            //delay(1000);
             homePaddle.createPaddle(display);
             awayPaddle.createPaddle(display);
             ball.createBall(display);

@@ -22,7 +22,7 @@ void PongClass::gameStartup(Adafruit_SSD1306 &display) {
   delay(1500);
   display.clearDisplay();
   //createScoreboard(display);
-  display.display();
+  //display.display();
 }
 
 void PongClass::createScoreboard(Adafruit_SSD1306 &display) {
@@ -30,7 +30,7 @@ void PongClass::createScoreboard(Adafruit_SSD1306 &display) {
   display.print(_homeScore);
   display.setCursor(102,5);
   display.print(_awayScore);
-  display.display();
+  //display.display();
 }
 
 void PongClass::resetGame(Adafruit_SSD1306 &display, PaddleClass &homePaddle, PaddleClass &awayPaddle, BallClass &ball){

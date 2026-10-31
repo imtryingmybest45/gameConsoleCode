@@ -28,7 +28,7 @@ class BallClass {
     void createBall(Adafruit_SSD1306& display);
     void moveBall(Adafruit_SSD1306& display, PaddleClass &homePaddle, PaddleClass &awayPaddle);
     void drawBall(Adafruit_SSD1306& display, int color, PaddleClass &homePaddle, PaddleClass &awayPaddle);
-    void calcYVel(PaddleClass &homePaddle, PaddleClass &awayPaddle, int homepaddle);
+    void calcVels(PaddleClass &homePaddle, PaddleClass &awayPaddle, int homepaddle);
 };
 
 #endif
