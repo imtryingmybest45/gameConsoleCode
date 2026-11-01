@@ -116,7 +116,8 @@ void BallClass::moveBall(Adafruit_SSD1306 &display, PaddleClass &homePaddle, Pad
            calcVels(homePaddle, awayPaddle, 1);
 
         }
-        else if (_xPos+1 >= awayPaddle._xPos-1 && _xPos+1 <= awayPaddle._xPos && _yPos >= awayPaddle._paddlePos[0] && _yPos <= awayPaddle._paddlePos[awayPaddle._paddleLength-1]){
+        //else if (_xPos+1 >= awayPaddle._xPos-1 && _xPos+1 <= awayPaddle._xPos && _yPos >= awayPaddle._paddlePos[0] && _yPos <= awayPaddle._paddlePos[awayPaddle._paddleLength-1]){
+        else if (_xPos+1 >= awayPaddle._xPos-1 && _xPos+1 <= awayPaddle._xPos && _yPos >= awayPaddle._paddlePos[0]-1 && _yPos <= awayPaddle._paddlePos[awayPaddle._paddleLength-1]+1){
             _xVel = -_xVel;
            //calcYVel(homePaddle, awayPaddle, 0);
            calcVels(homePaddle, awayPaddle, 0);

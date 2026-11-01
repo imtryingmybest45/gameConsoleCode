@@ -83,7 +83,7 @@ void PaddleClass::moveAwayPaddle(Adafruit_SSD1306 &display, BallClass &ball){
         int y0 = ball._yPos;
         int y;
         int vy = ball._yVel;
-        int randInt = random(1,5);
+        int randInt = random(-2,3);
         for (int ii = 0; ii <= t; ii++){
             y = y0 + vy;
             if (y <= 1 || y >= display.height()-1){
@@ -91,19 +91,25 @@ void PaddleClass::moveAwayPaddle(Adafruit_SSD1306 &display, BallClass &ball){
             }
             y0 = y;
         }
-        /*if (y < _paddlePos[0]){
-            _delt = _paddlePos[0] - y;
+        _paddleVel = 2;
+        if (_paddlePos[0]-y > 0){
+            _delt = _paddlePos[1] - y;
+            _counter = floor(abs(_delt/_paddleVel)) - random(-1,2);
         }
-        else if (y > _paddlePos[_paddleLength-1]){
-            _delt = _paddlePos[_paddleLength-1] - y;
+        else if (_paddlePos[_paddleLength-1]-y < 0){
+            _delt = _paddlePos[_paddleLength-2]-y;
+            _counter = floor(abs(_delt/_paddleVel)) - random(-1,2);
         }
         else{
-            _delt = _paddlePos[_paddleLength/2] - y;
-        }*/
-        _delt = _paddlePos[_paddleLength/2] - y;
-        _paddleVel = 2;
-        _counter = floor(abs(_delt)/_paddleVel)-randInt;
-        //_counter = floor(abs(_delt/_paddleVel));
+            _delt = _paddlePos[random(2,_paddleLength-2)] - y;
+            if (abs(_delt) >= _paddlePos[_paddleLength-3]-_paddlePos[2]){
+                randInt = random(3,6);
+            }
+            else{
+                randInt = random(6,9);
+            }
+            _counter = floor(abs(_delt/_paddleVel)) - randInt;
+        }
         _calcFlag = 0;
     }
     else if (ball._xVel > 0 && ball._xPos >= endTracking){
