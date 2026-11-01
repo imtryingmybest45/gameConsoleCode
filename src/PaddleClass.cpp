@@ -105,6 +105,9 @@ void PaddleClass::moveAwayPaddle(Adafruit_SSD1306 &display, BallClass &ball){
             if (abs(_delt) >= _paddlePos[_paddleLength-3]-_paddlePos[2]){
                 randInt = random(3,6);
             }
+            else if (abs(_delt) < 5){
+                randInt = random(-2,0);
+            }
             else{
                 randInt = random(6,9);
             }
