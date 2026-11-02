@@ -30,7 +30,7 @@ void MenuClass::displayMenu(Adafruit_SSD1306& display) {
 
     strcpy(messageList[0],"Pong");
     strcpy(messageList[1], "Snake");
-    strcpy(messageList[2], "Other Game");
+    strcpy(messageList[2], "Breakout");
 
     for (int i = 0; i < 3; i++){
         display.getTextBounds(messageList[i], 0, 0, &x1, &y1, &w, &h);
