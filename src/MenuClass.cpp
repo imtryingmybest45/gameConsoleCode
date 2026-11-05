@@ -16,101 +16,51 @@ MenuClass::MenuClass(int maxBuffSize, int maxRowSize, int maxLineSize, Adafruit_
 
 
 void MenuClass::displayMenu(Adafruit_SSD1306& display) {
-    int16_t x1, y1;
-    uint16_t w, h;
+
     char messageList[3][15];
-    int startwidths[3];
-    int totalSum = 0;
-    int SCREEN_WIDTH = display.width();
-    int SCREEN_HEIGHT = display.height();
-    TextFunctions textFunc(100, 5, 32, display);
     _menuInd = 0;
-    _mainMenu = 1;
+    //_mainMenu = 1;
+    _menuMode = 1;
     _gameMode = 0;
 
     strcpy(messageList[0],"Pong");
     strcpy(messageList[1], "Snake");
     strcpy(messageList[2], "Breakout");
 
-    for (int i = 0; i < 3; i++){
-        display.getTextBounds(messageList[i], 0, 0, &x1, &y1, &w, &h);
-        startwidths[i] = (SCREEN_WIDTH - w)/2;
-        _widths[i] = w;
-        _heights[i] = h;
-    }
-
-    for (int i = 0; i < 3; i++){
-        totalSum += _heights[i];
-    }
-
-    int startH = (SCREEN_HEIGHT - totalSum) / 2 + _heights[0];
-    for (int i = 0; i < 3; i++){
-        //display.setCursor(widths[i], startH);
-        display.setCursor(startwidths[i], startH);
-        display.print(messageList[i]);
-        startH = startH + _heights[i];
-    }
-
-    display.setCursor(0,0);
-    textFunc.drawAlignedText("Select which game you would like to play: ", display);
-    startH = (SCREEN_HEIGHT - totalSum) / 2;
-    int indx = 0;
-    for (int i = 0; i < indx+1; i++){
-        startH += _heights[i];
-    }
-
-    textFunc.invertPixelRange(display, startwidths[indx], startH, _widths[indx], _heights[indx]);
-
-    display.display();
+    dispMenuOptions(display,messageList,"Select which game you would like to play: ");
 
 }
 
 void MenuClass::displayGameMenu(Adafruit_SSD1306& display) {
-    int16_t x1, y1;
-    uint16_t w, h;
+
     char messageList[3][15];
-    int startwidths[3];
-    int totalSum = 0;
-    int SCREEN_WIDTH = display.width();
-    int SCREEN_HEIGHT = display.height();
     TextFunctions textFunc(100, 5, 32, display);
     _menuInd = 0;
-    _mainMenu = 0;
+    //_mainMenu = 0;
+    _menuMode = 2;
     _gameMenuOption = 0;
 
     strcpy(messageList[0],"Start New Game");
     strcpy(messageList[1], "High Scores");
     strcpy(messageList[2], "Go Back");
 
-    for (int i = 0; i < 3; i++){
-        display.getTextBounds(messageList[i], 0, 0, &x1, &y1, &w, &h);
-        startwidths[i] = (SCREEN_WIDTH - w)/2;
-        _widths[i] = w;
-        _heights[i] = h;
-    }
+    dispMenuOptions(display,messageList,"What do you want to do?");
 
-    for (int i = 0; i < 3; i++){
-        totalSum += _heights[i];
-    }
+}
 
-    int startH = (SCREEN_HEIGHT - totalSum) / 2 + _heights[0];
-    for (int i = 0; i < 3; i++){
-        //display.setCursor(widths[i], startH);
-        display.setCursor(startwidths[i], startH);
-        display.print(messageList[i]);
-        startH = startH + _heights[i];
-    }
+void MenuClass::displayEndMenu(Adafruit_SSD1306& display) {
 
-    display.setCursor(0,0);
-    textFunc.drawAlignedText("What do you want to do? ", display);
-    startH = (SCREEN_HEIGHT - totalSum) / 2;
-    int indx = 0;
-    for (int i = 0; i < indx+1; i++){
-        startH += _heights[i];
-    }
+    char messageList[3][15];
+    TextFunctions textFunc(100, 5, 32, display);
+    _menuInd = 0;
+    //_mainMenu = 0;
+    _endGameOption = 0;
 
-    textFunc.invertPixelRange(display, startwidths[indx], startH, _widths[indx], _heights[indx]);
-    display.display();
+    strcpy(messageList[0],"Play Again");
+    strcpy(messageList[1], "Go Home");
+    strcpy(messageList[2], "\0");
+
+    dispMenuOptions(display,messageList,"What do you want to do?");
 
 }
 
@@ -120,9 +70,14 @@ void MenuClass::menuDown(Adafruit_SSD1306& display) {
     int SCREEN_WIDTH = display.width();
     int SCREEN_HEIGHT = display.height();
     int totalSum = 0;
+    int menuSize = 3;
     TextFunctions textFunc(100, 5, 32, display);
 
-    for (int i = 0; i < 3; i++){
+    if (_menuMode == 3){
+        menuSize = 2;
+    }
+
+    for (int i = 0; i < menuSize; i++){
         startwidths[i] = (SCREEN_WIDTH - _widths[i])/2;
         totalSum += _heights[i];
     }
@@ -135,7 +90,7 @@ void MenuClass::menuDown(Adafruit_SSD1306& display) {
     textFunc.invertPixelRange(display, startwidths[_menuInd], startH, _widths[_menuInd], _heights[_menuInd]);
 
     _menuInd = _menuInd + 1;
-    if (_menuInd>2){
+    if (_menuInd>menuSize-1){
         _menuInd = 0;
     }
 
@@ -148,11 +103,60 @@ void MenuClass::menuDown(Adafruit_SSD1306& display) {
 
     display.display();
 
-    if (_mainMenu == 1){
+    if (_menuMode == 1){
         _gameMode = _menuInd;
     }
-    else{
+    else if (_menuMode == 2){
         _gameMenuOption = _menuInd;
-    };
+    }
+    else{
+        _endGameOption = _menuInd;
+    }
 
+}
+
+void MenuClass::dispMenuOptions(Adafruit_SSD1306& display, char (&messageList)[3][15], char (*dispMessage)){
+    int16_t x1, y1;
+    uint16_t w, h;
+    int startwidths[3];
+    int totalSum = 0;
+    int SCREEN_WIDTH = display.width();
+    int SCREEN_HEIGHT = display.height();
+    int menuSize = 3;
+    TextFunctions textFunc(100, 5, 32, display);
+
+    for (int i = 0; i < 3; i++){
+        if(messageList[i][0]=='\0'){
+            menuSize = i;
+        }
+    }
+
+    for (int i = 0; i < menuSize; i++){
+        display.getTextBounds(messageList[i], 0, 0, &x1, &y1, &w, &h);
+        startwidths[i] = (SCREEN_WIDTH - w)/2;
+        _widths[i] = w;
+        _heights[i] = h;
+    }
+
+    for (int i = 0; i < menuSize; i++){
+        totalSum += _heights[i];
+    }
+
+    int startH = (SCREEN_HEIGHT - totalSum) / 2 + _heights[0];
+    for (int i = 0; i < menuSize; i++){
+        display.setCursor(startwidths[i], startH);
+        display.print(messageList[i]);
+        startH = startH + _heights[i];
+    }
+
+    display.setCursor(0,0);
+    textFunc.drawAlignedText(dispMessage,display);
+    startH = (SCREEN_HEIGHT - totalSum) / 2;
+    int indx = 0;
+    for (int i = 0; i < indx+1; i++){
+        startH += _heights[i];
+    }
+
+    textFunc.invertPixelRange(display, startwidths[indx], startH, _widths[indx], _heights[indx]);
+    display.display();
 }

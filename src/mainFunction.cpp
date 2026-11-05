@@ -66,6 +66,8 @@ PaddleClass homePaddle(display, 1);
 BallClass ball(display, -1);
 int pongMode = 0;
 int onFlag = 1;
+int startGameFlag = 1;
+int awayWin = 0;
 
 
 void setup()  {
@@ -94,14 +96,15 @@ void setup()  {
 }
 
 void menuFunc(MenuClass &menu, Adafruit_SSD1306 &display){
-   if (menu._mainMenu == 1){
+   if (menu._menuMode == 1){
         display.clearDisplay();
         menu.displayGameMenu(display);
    }
-   else{
+   else if (menu._menuMode == 2){
         if (menu._gameMenuOption == 0){
             if (menu._gameMode == 0){
                 pongMode = 1;
+                menu._menuMode = 2;
             }
             else if (menu._gameMode == 1){
                 Serial.println("You are now playing Snake.");
@@ -126,6 +129,15 @@ void menuFunc(MenuClass &menu, Adafruit_SSD1306 &display){
             menu.displayMenu(display);
         }
    }
+   else{
+        if (menu._endGameOption == 0){
+            pongMode = 1;
+        }
+        else{
+            display.clearDisplay();
+            menu.displayMenu(display);
+        }
+   }
     delay(300);
 }
 
@@ -139,11 +151,12 @@ void loop(){
 
     if (switchStateV == 1){
        menuFunc(menu, display);
-       if (pongMode == 1){
+       if (pongMode == 1 && startGameFlag == 1){
             pong.gameStartup(display);
             homePaddle.createPaddle(display);
             awayPaddle.createPaddle(display);
             ball.createBall(display);
+            startGameFlag = 0;
        }
     }
 
@@ -155,6 +168,7 @@ void loop(){
         display.clearDisplay();
         menu.displayMenu(display);
         delay(300);
+        startGameFlag = 1;
     }
 
     if (switchStateW == 1){
@@ -183,6 +197,7 @@ void loop(){
             pong._homeScore = 0;
             pong._awayScore = 0;
             delay(500);
+            startGameFlag = 1;
         }
        else{
             txtFuncs.drawCenteredText("Welcome to my gaming console.",display);
@@ -199,14 +214,18 @@ void loop(){
         if (ball._xPos < 0 || ball._xPos > SCREEN_WIDTH){
             if (ball._xPos < 0){
                 pong._awayScore = pong._awayScore+1;
+                awayWin = 1;
             }
             else{
                 pong._homeScore = pong._homeScore+1;
+                awayWin = 0;
             }
             pong.createScoreboard(display);
             display.display();
             delay(1500);
+
             if(pong._homeScore == 7 || pong._awayScore == 7){
+                pong.resetGame(display, homePaddle, awayPaddle, ball);
                 if (pong._homeScore == 7){
                     txtFuncs.drawCenteredText("You win!",display);
                     delay(1500);
@@ -217,14 +236,24 @@ void loop(){
                 }
                 pong._homeScore = 0;
                 pong._awayScore = 0;
+                display.clearDisplay();
+                pongMode = 0;
+                startGameFlag = 1;
+                menu._menuMode = 3;
+                display.clearDisplay();
+                menu.displayEndMenu(display);
             }
-            pong.resetGame(display, homePaddle, awayPaddle, ball);
-            display.clearDisplay();
-            display.display();
-            //delay(1000);
-            homePaddle.createPaddle(display);
-            awayPaddle.createPaddle(display);
-            ball.createBall(display);
+            else{
+                pong.resetGame(display, homePaddle, awayPaddle, ball);
+                if (awayWin == 0){
+                    ball._xVel = 1;
+                }
+                display.clearDisplay();
+                display.display();
+                homePaddle.createPaddle(display);
+                awayPaddle.createPaddle(display);
+                ball.createBall(display);
+            }
         }
     }
 

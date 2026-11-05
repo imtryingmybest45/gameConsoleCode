@@ -66,6 +66,60 @@ void PaddleClass::drawPaddle(Adafruit_SSD1306 &display, int yInc, int color){
 }
 
 void PaddleClass::moveAwayPaddle(Adafruit_SSD1306 &display, BallClass &ball){
+    int startTracking = display.width()/2 - 25;
+    int endTracking = display.width()/2 + 40; //was +45
+    if(ball._xVel > 0 && ball._xPos > startTracking && ball._xPos < endTracking){
+        if ((ball._yPos - _paddlePos[_paddleLength/2])>0){
+            movePaddleDown(display, 1);
+        }
+        else if ((ball._yPos - _paddlePos[_paddleLength/2]<0)){
+            movePaddleUp(display, 1);
+        }
+    }
+    else if (ball._xVel > 0 && (ball._xPos == endTracking || ball._xPos-1 == endTracking) && _calcFlag){
+        _counter = 0;
+        _t = 0;
+        int t = floor((_xPos - endTracking)/abs(ball._xVel));
+        int y0 = ball._yPos;
+        int y;
+        int vy = ball._yVel;
+        int randInt = random(-2,3);
+        for (int ii = 0; ii <= t; ii++){
+            y = y0 + vy;
+            if (y <= 1 || y >= display.height()-1){
+                vy = -vy;
+            }
+            y0 = y;
+        }
+        _paddleVel = 2;
+        if (_paddlePos[0]-y > 0){
+            _delt = _paddlePos[2] - y; //was _delt = _paddlePos[0]-y
+        }
+        else if (_paddlePos[_paddleLength-1]-y < 0){
+            _delt = _paddlePos[_paddleLength-2]-y;
+        }
+        else{
+            _delt = _paddlePos[random(2,_paddleLength-2)] - y;
+        }
+        _counter = floor(abs(_delt/_paddleVel))-randInt;
+        _calcFlag = 0;
+    }
+    else if (ball._xVel > 0 && ball._xPos >= endTracking){
+        //display.drawPixel(endTracking, 32, SSD1306_WHITE);
+        _calcFlag = 1;
+        if (_t < _counter){
+            if (_delt > 0){
+                movePaddleUp(display, _paddleVel);
+            }
+            else if (_delt < 0){
+                movePaddleDown(display, _paddleVel);
+            }
+            _t++;
+        }
+    }
+}
+
+/*void PaddleClass::moveAwayPaddle(Adafruit_SSD1306 &display, BallClass &ball){
     int startTracking = display.width()/2 - 50;
     int endTracking = display.width()/2 + 25;
     if(ball._xVel > 0 && ball._xPos > startTracking && ball._xPos < endTracking){
@@ -127,4 +181,4 @@ void PaddleClass::moveAwayPaddle(Adafruit_SSD1306 &display, BallClass &ball){
             _t++;
         }
     }
-}
+}*/
