@@ -81,8 +81,8 @@ void setup()  {
     pinMode(5,INPUT); //A pin
     pinMode(12,INPUT); //D pin
     pinMode(13,INPUT); //V pin
-    //pinMode(26, INPUT);
-    pinMode(11,INPUT);
+    pinMode(26, INPUT);
+    //pinMode(11,INPUT);
 
     Serial.begin(9600);
     display.begin(SSD1306_SWITCHCAPVCC, 0x3C);
@@ -155,8 +155,8 @@ void loop(){
   switchStateW = digitalRead(4);
   switchStateD = digitalRead(12);
   switchStateV = digitalRead(13);
-  //switchStatePower = digitalRead(26);
-  switchStatePower = digitalRead(11);
+  switchStatePower = digitalRead(26);
+  //switchStatePower = digitalRead(11);
 
     if (switchStateV == 1){
        menuFunc(menu, display);
@@ -176,19 +176,10 @@ void loop(){
 
     if (switchStateA == 1){
         if (snakeMode == 1){
-            snake.changeDirection(1);
+            if (snake._snakeInfo[0][0][2]==0){
+                snake.changeDirection(1);
+            }
         }
-        /*else{
-            pongMode = 0;
-            snakeMode = 0;
-            pong.resetGame(display, homePaddle, awayPaddle, ball);
-            pong._homeScore = 0;
-            pong._awayScore = 0;
-            display.clearDisplay();
-            menu.displayMenu(display);
-            delay(300);
-            startGameFlag = 1;
-       }*/
     }
 
     if (switchStateW == 1){
@@ -196,7 +187,9 @@ void loop(){
             homePaddle.movePaddleUp(display, 2);
         }
         else if (snakeMode == 1){
-            snake.changeDirection(2);
+            if (snake._snakeInfo[0][0][3] == 0){
+                snake.changeDirection(2);
+            }
         }
     }
 
@@ -205,7 +198,9 @@ void loop(){
             homePaddle.movePaddleDown(display, 2);
         }
         else if (snakeMode == 1){
-            snake.changeDirection(4);
+            if (snake._snakeInfo[0][0][3]==0){
+                snake.changeDirection(4);
+            }
         }
         else{
             menu.menuDown(display);
@@ -215,29 +210,10 @@ void loop(){
 
     if (switchStateD == 1){
         if (snakeMode == 1){
-            snake.changeDirection(3);
+            if (snake._snakeInfo[0][0][2]==0){
+                snake.changeDirection(3);
+            }
         }
-        /*else{
-            if (onFlag == 1){
-            display.clearDisplay();
-            display.display();
-            onFlag = 0;
-            pongMode = 0;
-            snakeMode = 0;
-            pong.resetGame(display, homePaddle, awayPaddle, ball);
-            pong._homeScore = 0;
-            pong._awayScore = 0;
-            delay(500);
-            startGameFlag = 1;
-            }
-            else{
-                txtFuncs.drawCenteredText("Welcome to my gaming console.",display);
-                delay(2000);
-                display.clearDisplay();
-                menu.displayMenu(display);
-                onFlag = 1;
-            }
-        }*/
     }
 
     if (switchStatePower == 1){

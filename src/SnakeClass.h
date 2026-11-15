@@ -18,16 +18,14 @@ class SnakeClass {
     int _score = 0;
     const static int _MAX_COLUMNS = 24;
     int _snakeInfo[2][_MAX_COLUMNS][5];
-    int _wayPointInfo[4];
-    int _initialLength = 16;
-    /*int _xVel = 0;
-    int _yVel = 1;*/
+    int _wayPointInfo[5][_MAX_COLUMNS];
+    int _initialLength = 24;
     int _xVel = -1;
     int _yVel = 0;
+    int _cw = 0;
+    int _calcLastSeg = 0;
     int _counter = 0;
-    int _t = 0;
-    int _calcFlag = 0;
-    int _cw = 1;
+    int _flag = 0;
 
     SnakeClass(Adafruit_SSD1306& display); 
 
@@ -35,6 +33,11 @@ class SnakeClass {
     void createSnake(Adafruit_SSD1306& display);
     void moveSnake(Adafruit_SSD1306& display);
     void changeDirection(int direction);
+    void rotateClockwise(int c);
+    void rotateCounterClockwise(int c);
+    void assignVelocities();
+    void rotateSegments();
+    void decrementSnake(int c);
 
 };
 
