@@ -111,7 +111,6 @@ void SnakeClass::assignVelocities(){
                     }
                     else{
                         if (_snakeInfo[i][j][1] == _wayPointInfo[1][wpInd]){
-                            _flag = 1;
                             _snakeInfo[i][j-1][2] = _wayPointInfo[2][wpInd];
                             _snakeInfo[i][j-1][3] = _wayPointInfo[3][wpInd];
                             _snakeInfo[i][j][2] = _wayPointInfo[2][wpInd];
@@ -315,4 +314,151 @@ void SnakeClass::decrementSnake(int c){
     _snakeInfo[0][c+1][4]--;
     _snakeInfo[1][c][4]--;
     _snakeInfo[1][c+1][4]--;
+}
+
+void SnakeClass::spawnFood(Adafruit_SSD1306 &display){
+
+    int XArr[2*_MAX_COLUMNS];
+    int YArr[2*_MAX_COLUMNS];
+    int k  = 0;
+    int maxX;
+    int maxY;
+    int minX;
+    int minY;
+    int xPos;
+    int yPos;
+    int yRand;
+    int xRand;
+
+    if (_flag == 1){
+        for (int i = 0; i < 2; i++){
+            for (int j = 0; j < 2; j++){
+                display.drawPixel(_foodPos[i][j][0],_foodPos[i][j][1],SSD1306_BLACK);
+            }
+        }
+
+        for (int i = 0; i < 2; i++){
+            for (int j = 0; j < _initialLength; j++){
+                XArr[k] = _snakeInfo[i][j][0];
+                YArr[k] = _snakeInfo[i][j][1];
+                k++;
+            }
+        }
+
+        maxX = XArr[0];
+        minX = XArr[0];
+
+        for (int i = 1; i < 2*_initialLength; i++){
+            if (XArr[i]>maxX){
+                maxX = XArr[i];
+            }
+            else if (XArr[i]<minX){
+                minX = XArr[i];
+            }
+        }
+
+        maxY = YArr[0];
+        minY = YArr[0];
+
+        for (int i = 1; i < 2*_initialLength; i++){
+            if (YArr[i]>maxY){
+                maxY = YArr[i];
+            }
+            else if (YArr[i]<minY){
+                minY = YArr[i];
+            }
+        }
+
+        maxX = maxX + 6;
+        minX = minX - 6;
+        maxY = maxY + 6;
+        minY = minY - 6;
+
+        xRand = random(0,2);
+        xPos = xRand*random(3,minX) + (1-xRand)*random(maxX,display.width()-3);
+        if (xPos > 161){
+            xPos = 161;
+        }
+        else if (xPos < 3){
+            xPos = 3;
+        }
+
+        yRand = random(0,2);
+        yPos = yRand*random(3,minY) + (1-yRand)*random(maxY,display.height()-3);
+        if (yPos > 61){
+            yPos = 61;
+        }
+        else if (yPos < 3){
+            yPos = 3;
+        }
+
+        _foodPos[0][0][0] = xPos;
+        _foodPos[0][1][0] = xPos-1;
+        _foodPos[1][0][0] = xPos;
+        _foodPos[1][1][0] = xPos-1;
+
+        _foodPos[0][0][1] = yPos;
+        _foodPos[0][1][1] = yPos;
+        _foodPos[1][0][1] = yPos-1;
+        _foodPos[1][1][1] = yPos-1;
+
+        for (int i = 0; i < 2; i++){
+            for (int j = 0; j < 2; j++){
+                display.drawPixel(_foodPos[i][j][0],_foodPos[i][j][1],SSD1306_WHITE);
+            }
+        }
+
+        Serial.print("X Pos: "); Serial.println(xPos);
+        Serial.print("Y Pos: "); Serial.println(yPos);
+        _flag = 0;
+    }
+
+}
+
+void SnakeClass::checkFood(Adafruit_SSD1306 &display){
+    _eatFood = 0;
+    for (int k = 0; k < 2; k++){
+        for (int i = 0; i < 2; i++){
+            for (int j = 0; j < 2; j++){
+                if (_foodPos[i][j][0] == _snakeInfo[k][0][0] && _foodPos[i][j][1] == _snakeInfo[k][0][1]){
+                    _eatFood = 1;
+                    break;
+                }
+            }
+        }
+    }
+    if (_eatFood == 1){
+        //increaseLength();
+        _flag = 1;
+    }
+}
+
+void SnakeClass::increaseLength(){
+
+    if (_xVel < 0){
+        _snakeInfo[0][_initialLength][0] = _snakeInfo[0][_initialLength-1][0]++;
+        _snakeInfo[0][_initialLength+1][0] = _snakeInfo[0][_initialLength][0]++;
+        _snakeInfo[1][_initialLength][0] = _snakeInfo[1][_initialLength-1][0]++;
+        _snakeInfo[1][_initialLength+1][0] = _snakeInfo[1][_initialLength][0]++;
+    }
+    else if (_xVel > 0){
+        _snakeInfo[0][_initialLength][0] = _snakeInfo[0][_initialLength-1][0]--;
+        _snakeInfo[0][_initialLength+1][0] = _snakeInfo[0][_initialLength][0]--;
+        _snakeInfo[1][_initialLength][0] = _snakeInfo[1][_initialLength-1][0]--;
+        _snakeInfo[1][_initialLength+1][0] = _snakeInfo[1][_initialLength][0]--;
+    }
+    else if (_yVel < 0){
+        _snakeInfo[0][_initialLength][1] = _snakeInfo[0][_initialLength-1][1]++;
+        _snakeInfo[0][_initialLength+1][1] = _snakeInfo[0][_initialLength][1]++;
+        _snakeInfo[1][_initialLength][1] = _snakeInfo[1][_initialLength-1][1]++;
+        _snakeInfo[1][_initialLength+1][1] = _snakeInfo[1][_initialLength][1]++;
+    }
+    else{
+        _snakeInfo[0][_initialLength][1] = _snakeInfo[0][_initialLength-1][1]--;
+        _snakeInfo[0][_initialLength+1][1] = _snakeInfo[0][_initialLength][1]--;
+        _snakeInfo[1][_initialLength][1] = _snakeInfo[1][_initialLength-1][1]--;
+        _snakeInfo[1][_initialLength+1][1] = _snakeInfo[1][_initialLength][1]--;
+    }
+
+    _initialLength = _initialLength + 2;
 }

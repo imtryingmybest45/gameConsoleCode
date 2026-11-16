@@ -72,6 +72,7 @@ int onFlag = 1;
 int snakeMode = 0;
 int startGameFlag = 1;
 int awayWin = 0;
+int physFlag = 0;
 
 
 void setup()  {
@@ -81,8 +82,12 @@ void setup()  {
     pinMode(5,INPUT); //A pin
     pinMode(12,INPUT); //D pin
     pinMode(13,INPUT); //V pin
-    pinMode(26, INPUT);
-    //pinMode(11,INPUT);
+    if (physFlag == 1){
+        pinMode(11,INPUT);
+    }
+    else{
+        pinMode(26, INPUT);
+    }
 
     Serial.begin(9600);
     display.begin(SSD1306_SWITCHCAPVCC, 0x3C);
@@ -155,8 +160,13 @@ void loop(){
   switchStateW = digitalRead(4);
   switchStateD = digitalRead(12);
   switchStateV = digitalRead(13);
-  switchStatePower = digitalRead(26);
-  //switchStatePower = digitalRead(11);
+
+  if (physFlag == 1){
+    switchStatePower = digitalRead(11);
+  }
+  else{
+    switchStatePower = digitalRead(26);
+  }
 
     if (switchStateV == 1){
        menuFunc(menu, display);
@@ -228,6 +238,7 @@ void loop(){
             pong._awayScore = 0;
             delay(500);
             startGameFlag = 1;
+            snake._flag = 1;
         }
         else{
             txtFuncs.drawCenteredText("Welcome to my gaming console.",display);
@@ -288,6 +299,8 @@ void loop(){
     }
 
     else if (snakeMode == 1){
+        snake.spawnFood(display);
+        snake.checkFood(display);
         snake.moveSnake(display);
     }
 }
