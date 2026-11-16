@@ -72,7 +72,7 @@ int onFlag = 1;
 int snakeMode = 0;
 int startGameFlag = 1;
 int awayWin = 0;
-int physFlag = 0;
+int physFlag = 1;
 
 
 void setup()  {
@@ -239,6 +239,7 @@ void loop(){
             delay(500);
             startGameFlag = 1;
             snake._flag = 1;
+            snake._initialLength = 6;
         }
         else{
             txtFuncs.drawCenteredText("Welcome to my gaming console.",display);

@@ -16,10 +16,10 @@ class SnakeClass {
   public:
     // Constructor: Runs automatically when a class instance is created
     int _score = 0;
-    const static int _MAX_COLUMNS = 50;
+    const static int _MAX_COLUMNS = 100;
     int _snakeInfo[2][_MAX_COLUMNS][5];
     int _wayPointInfo[5][_MAX_COLUMNS];
-    int _initialLength = 24;
+    int _initialLength = 6;
     int _xVel = -1;
     int _yVel = 0;
     int _cw = 0;
@@ -27,6 +27,7 @@ class SnakeClass {
     int _counter = 0;
     int _flag = 1;
     int _eatFood = 0;
+    int _dirCounter = 2;
     const static int _foodSize = 2;
     int _foodPos[_foodSize][_foodSize][2];
 
