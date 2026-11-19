@@ -72,7 +72,7 @@ int onFlag = 1;
 int snakeMode = 0;
 int startGameFlag = 1;
 int awayWin = 0;
-int physFlag = 1;
+int physFlag = 0;
 
 
 void setup()  {
@@ -143,7 +143,12 @@ void menuFunc(MenuClass &menu, Adafruit_SSD1306 &display){
    }
    else{
         if (menu._endGameOption == 0){
-            pongMode = 1;
+            if (menu._gameMode == 0){
+                pongMode = 1;
+            }
+            else if (menu._gameMode == 1){
+                snakeMode = 1;
+            }
         }
         else{
             display.clearDisplay();
@@ -154,7 +159,6 @@ void menuFunc(MenuClass &menu, Adafruit_SSD1306 &display){
 }
 
 void loop(){
-    
   switchStateA = digitalRead(5);
   switchStateS = digitalRead(2);
   switchStateW = digitalRead(4);
@@ -238,8 +242,8 @@ void loop(){
             pong._awayScore = 0;
             delay(500);
             startGameFlag = 1;
-            snake._flag = 1;
-            snake._initialLength = 6;
+            snake._spawnFlag = 1;
+            snake._currentLength = snake._initialLength;
         }
         else{
             txtFuncs.drawCenteredText("Welcome to my gaming console.",display);
@@ -303,5 +307,26 @@ void loop(){
         snake.spawnFood(display);
         snake.checkFood(display);
         snake.moveSnake(display);
+        if (snake._gameOver == 1){
+            snakeMode = 0;
+            menu._menuMode = 3;
+            startGameFlag = 1;
+            display.clearDisplay();
+            char result[25];
+            char arr1[] = "You scored ";
+            char buffer[7];
+            itoa(snake._score,buffer,10);
+            strcpy(result,arr1);
+            strcat(result,buffer);
+            //txtFuncs.drawCenteredText(buffer,display);
+            txtFuncs.drawCenteredText(result,display);
+            delay(1500);
+            display.clearDisplay();
+            txtFuncs.drawCenteredText("Game Over",display);
+            delay(1500);
+            display.clearDisplay();
+            snake.restartGame(display);
+            menu.displayEndMenu(display);
+        }
     }
 }
