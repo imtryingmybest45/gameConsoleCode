@@ -10,6 +10,7 @@
 #include <PongClass.h>
 #include <PaddleClass.h>
 #include <BallClass.h>
+#include <SnakeClass.h>
 
 
 #define SCREEN_WIDTH 128 // OLED display width, in pixels
@@ -58,16 +59,20 @@ int switchStateA = 0;
 int switchStateW = 0;
 int switchStateS = 0;
 int switchStateD = 0;
+int switchStatePower = 0;
 TextFunctions txtFuncs(100, 5, 32, display);
 MenuClass menu(100, 5, 32, display);
 PongClass pong(display);
 PaddleClass awayPaddle(display, 0);
 PaddleClass homePaddle(display, 1);
 BallClass ball(display, -1);
+SnakeClass snake(display);
 int pongMode = 0;
 int onFlag = 1;
+int snakeMode = 0;
 int startGameFlag = 1;
 int awayWin = 0;
+int physFlag = 0;
 
 
 void setup()  {
@@ -77,6 +82,12 @@ void setup()  {
     pinMode(5,INPUT); //A pin
     pinMode(12,INPUT); //D pin
     pinMode(13,INPUT); //V pin
+    if (physFlag == 1){
+        pinMode(11,INPUT);
+    }
+    else{
+        pinMode(26, INPUT);
+    }
 
     Serial.begin(9600);
     display.begin(SSD1306_SWITCHCAPVCC, 0x3C);
@@ -108,6 +119,7 @@ void menuFunc(MenuClass &menu, Adafruit_SSD1306 &display){
             }
             else if (menu._gameMode == 1){
                 Serial.println("You are now playing Snake.");
+                snakeMode = 1;
             }
             else{
                 Serial.println("You are now in the other game option.");
@@ -131,7 +143,12 @@ void menuFunc(MenuClass &menu, Adafruit_SSD1306 &display){
    }
    else{
         if (menu._endGameOption == 0){
-            pongMode = 1;
+            if (menu._gameMode == 0){
+                pongMode = 1;
+            }
+            else if (menu._gameMode == 1){
+                snakeMode = 1;
+            }
         }
         else{
             display.clearDisplay();
@@ -142,12 +159,18 @@ void menuFunc(MenuClass &menu, Adafruit_SSD1306 &display){
 }
 
 void loop(){
-    
   switchStateA = digitalRead(5);
   switchStateS = digitalRead(2);
   switchStateW = digitalRead(4);
   switchStateD = digitalRead(12);
   switchStateV = digitalRead(13);
+
+  if (physFlag == 1){
+    switchStatePower = digitalRead(11);
+  }
+  else{
+    switchStatePower = digitalRead(26);
+  }
 
     if (switchStateV == 1){
        menuFunc(menu, display);
@@ -158,28 +181,41 @@ void loop(){
             ball.createBall(display);
             startGameFlag = 0;
        }
+       else if(snakeMode == 1 && startGameFlag == 1){
+            snake.gameStartup(display);
+            snake.createSnake(display);
+            snake.spawnFood(display);
+            startGameFlag = 0;
+       }
     }
 
     if (switchStateA == 1){
-        pongMode = 0;
-        pong.resetGame(display, homePaddle, awayPaddle, ball);
-        pong._homeScore = 0;
-        pong._awayScore = 0;
-        display.clearDisplay();
-        menu.displayMenu(display);
-        delay(300);
-        startGameFlag = 1;
+        if (snakeMode == 1){
+            if (snake._snakeInfo[0][0][2]==0){
+                snake.changeDirection(1);
+            }
+        }
     }
 
     if (switchStateW == 1){
         if (pongMode == 1){
             homePaddle.movePaddleUp(display, 2);
         }
+        else if (snakeMode == 1){
+            if (snake._snakeInfo[0][0][3] == 0){
+                snake.changeDirection(2);
+            }
+        }
     }
 
     if (switchStateS == 1){
         if (pongMode == 1){
             homePaddle.movePaddleDown(display, 2);
+        }
+        else if (snakeMode == 1){
+            if (snake._snakeInfo[0][0][3]==0){
+                snake.changeDirection(4);
+            }
         }
         else{
             menu.menuDown(display);
@@ -188,18 +224,29 @@ void loop(){
     }
 
     if (switchStateD == 1){
+        if (snakeMode == 1){
+            if (snake._snakeInfo[0][0][2]==0){
+                snake.changeDirection(3);
+            }
+        }
+    }
+
+    if (switchStatePower == 1){
         if (onFlag == 1){
             display.clearDisplay();
             display.display();
             onFlag = 0;
             pongMode = 0;
+            snakeMode = 0;
             pong.resetGame(display, homePaddle, awayPaddle, ball);
             pong._homeScore = 0;
             pong._awayScore = 0;
             delay(500);
             startGameFlag = 1;
+            snake._spawnFlag = 1;
+            snake._currentLength = snake._initialLength;
         }
-       else{
+        else{
             txtFuncs.drawCenteredText("Welcome to my gaming console.",display);
             delay(2000);
             display.clearDisplay();
@@ -257,5 +304,17 @@ void loop(){
         }
     }
 
-
+    else if (snakeMode == 1){
+        snake.moveSnake(display);
+        snake.checkFood(display);
+        snake.spawnFood(display);
+        if (snake._gameOver == 1){
+            snakeMode = 0;
+            menu._menuMode = 3;
+            startGameFlag = 1;
+            snake.displayScore(display);
+            snake.restartGame(display);
+            menu.displayEndMenu(display);
+        }
+    }
 }
