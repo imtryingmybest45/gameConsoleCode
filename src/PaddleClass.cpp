@@ -94,14 +94,17 @@ void PaddleClass::moveAwayPaddle(Adafruit_SSD1306 &display, BallClass &ball){
         _paddleVel = 2;
         if (_paddlePos[0]-y > 0){
             _delt = _paddlePos[2] - y; //was _delt = _paddlePos[0]-y
+            _counter = ceil(abs(_delt/_paddleVel))-randInt;
         }
         else if (_paddlePos[_paddleLength-1]-y < 0){
             _delt = _paddlePos[_paddleLength-2]-y;
+            _counter = floor(abs(_delt/_paddleVel))-randInt;
         }
         else{
             _delt = _paddlePos[random(2,_paddleLength-2)] - y;
+            _counter = floor(abs(_delt/_paddleVel))-randInt;
         }
-        _counter = floor(abs(_delt/_paddleVel))-randInt;
+        //_counter = floor(abs(_delt/_paddleVel))-randInt;
         _calcFlag = 0;
     }
     else if (ball._xVel > 0 && ball._xPos >= endTracking){

@@ -184,6 +184,7 @@ void loop(){
        else if(snakeMode == 1 && startGameFlag == 1){
             snake.gameStartup(display);
             snake.createSnake(display);
+            snake.spawnFood(display);
             startGameFlag = 0;
        }
     }
@@ -304,27 +305,14 @@ void loop(){
     }
 
     else if (snakeMode == 1){
-        snake.spawnFood(display);
-        snake.checkFood(display);
         snake.moveSnake(display);
+        snake.checkFood(display);
+        snake.spawnFood(display);
         if (snake._gameOver == 1){
             snakeMode = 0;
             menu._menuMode = 3;
             startGameFlag = 1;
-            display.clearDisplay();
-            char result[25];
-            char arr1[] = "You scored ";
-            char buffer[7];
-            itoa(snake._score,buffer,10);
-            strcpy(result,arr1);
-            strcat(result,buffer);
-            //txtFuncs.drawCenteredText(buffer,display);
-            txtFuncs.drawCenteredText(result,display);
-            delay(1500);
-            display.clearDisplay();
-            txtFuncs.drawCenteredText("Game Over",display);
-            delay(1500);
-            display.clearDisplay();
+            snake.displayScore(display);
             snake.restartGame(display);
             menu.displayEndMenu(display);
         }
