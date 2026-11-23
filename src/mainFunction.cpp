@@ -11,6 +11,7 @@
 #include <PaddleClass.h>
 #include <BallClass.h>
 #include <SnakeClass.h>
+#include <BreakoutClass.h>
 
 
 #define SCREEN_WIDTH 128 // OLED display width, in pixels
@@ -67,9 +68,11 @@ PaddleClass awayPaddle(display, 0);
 PaddleClass homePaddle(display, 1);
 BallClass ball(display, -1);
 SnakeClass snake(display);
+BreakoutClass breakout(display);
 int pongMode = 0;
 int onFlag = 1;
 int snakeMode = 0;
+int breakoutMode = 0;
 int startGameFlag = 1;
 int awayWin = 0;
 int physFlag = 0;
@@ -118,11 +121,11 @@ void menuFunc(MenuClass &menu, Adafruit_SSD1306 &display){
                 menu._menuMode = 2;
             }
             else if (menu._gameMode == 1){
-                Serial.println("You are now playing Snake.");
                 snakeMode = 1;
             }
             else{
-                Serial.println("You are now in the other game option.");
+                Serial.println("You are now playing Breakout.");
+                breakoutMode = 1;
             }
         }
         else if (menu._gameMenuOption == 1){
@@ -133,7 +136,7 @@ void menuFunc(MenuClass &menu, Adafruit_SSD1306 &display){
                 Serial.println("You are now viewing the high scores for Snake.");
             }
             else{
-                Serial.println("You are now viewing the high scores for the other game option.");
+                Serial.println("You are now viewing the high scores for Breakout.");
             }
         }
         else{
@@ -187,6 +190,18 @@ void loop(){
             snake.spawnFood(display);
             startGameFlag = 0;
        }
+       else if(breakoutMode == 1 && startGameFlag == 1){
+            breakout.gameStartup(display);
+            breakout.createBoard(display);
+            breakout.createPaddle(display);
+            breakout.createBall(display);
+            startGameFlag = 0;
+       }
+       else if (breakoutMode == 1 && startGameFlag == 0){
+            if (breakout._launchBall == 0){
+                breakout._launchBall = 1;
+            }
+       }
     }
 
     if (switchStateA == 1){
@@ -194,6 +209,9 @@ void loop(){
             if (snake._snakeInfo[0][0][2]==0){
                 snake.changeDirection(1);
             }
+        }
+        else if(breakoutMode == 1){
+            breakout.movePaddleLeft(display,2);
         }
     }
 
@@ -229,6 +247,9 @@ void loop(){
                 snake.changeDirection(3);
             }
         }
+        else if(breakoutMode == 1){
+            breakout.movePaddleRight(display,2);
+        }
     }
 
     if (switchStatePower == 1){
@@ -238,6 +259,7 @@ void loop(){
             onFlag = 0;
             pongMode = 0;
             snakeMode = 0;
+            breakoutMode = 0;
             pong.resetGame(display, homePaddle, awayPaddle, ball);
             pong._homeScore = 0;
             pong._awayScore = 0;
@@ -245,6 +267,8 @@ void loop(){
             startGameFlag = 1;
             snake._spawnFlag = 1;
             snake._currentLength = snake._initialLength;
+            breakout._ballXVel = 0;
+            breakout._ballYVel = 0;
         }
         else{
             txtFuncs.drawCenteredText("Welcome to my gaming console.",display);
@@ -315,6 +339,12 @@ void loop(){
             snake.displayScore(display);
             snake.restartGame(display);
             menu.displayEndMenu(display);
+        }
+    }
+    else if (breakoutMode == 1){
+        if (breakout._launchBall == 1){
+            breakout.moveBall(display);
+            breakout.checkCollision(display);
         }
     }
 }
