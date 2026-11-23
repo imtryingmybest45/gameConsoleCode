@@ -124,7 +124,6 @@ void menuFunc(MenuClass &menu, Adafruit_SSD1306 &display){
                 snakeMode = 1;
             }
             else{
-                Serial.println("You are now playing Breakout.");
                 breakoutMode = 1;
             }
         }
@@ -151,6 +150,9 @@ void menuFunc(MenuClass &menu, Adafruit_SSD1306 &display){
             }
             else if (menu._gameMode == 1){
                 snakeMode = 1;
+            }
+            else if (menu._gameMode == 2){
+                breakoutMode = 1;
             }
         }
         else{
@@ -197,7 +199,8 @@ void loop(){
             breakout.createBall(display);
             startGameFlag = 0;
        }
-       else if (breakoutMode == 1 && startGameFlag == 0){
+       //else if (breakoutMode == 1 && startGameFlag == 0){
+       else if (breakoutMode == 1){
             if (breakout._launchBall == 0){
                 breakout._launchBall = 1;
             }
@@ -211,7 +214,8 @@ void loop(){
             }
         }
         else if(breakoutMode == 1){
-            breakout.movePaddleLeft(display,2);
+            //breakout.movePaddleLeft(display,2);
+            breakout.movePaddleLeft(display,3);
         }
     }
 
@@ -248,7 +252,8 @@ void loop(){
             }
         }
         else if(breakoutMode == 1){
-            breakout.movePaddleRight(display,2);
+            //breakout.movePaddleRight(display,2);
+            breakout.movePaddleRight(display,3);
         }
     }
 
@@ -267,8 +272,16 @@ void loop(){
             startGameFlag = 1;
             snake._spawnFlag = 1;
             snake._currentLength = snake._initialLength;
-            breakout._ballXVel = 0;
-            breakout._ballYVel = 0;
+            breakout._launchBall = 0;
+            if (random(1,3) == 1){
+                breakout._ballXVel = 1;
+            }
+            else{
+                breakout._ballXVel = -1;
+            }
+            breakout._ballYVel = -1;
+            breakout._xRangeMin = display.width()/2 - breakout._paddleWidth/2;
+            breakout._xRangeMax = display.width()/2 + breakout._paddleWidth/2;
         }
         else{
             txtFuncs.drawCenteredText("Welcome to my gaming console.",display);
@@ -344,7 +357,15 @@ void loop(){
     else if (breakoutMode == 1){
         if (breakout._launchBall == 1){
             breakout.moveBall(display);
-            breakout.checkCollision(display);
+            breakout.checkCollisions(display);
+        }
+        if (breakout._numLives == 0){
+            breakoutMode = 0;
+            menu._menuMode = 3;
+            startGameFlag = 1;
+            breakout.displayScore(display);
+            breakout.restartGame(display);
+            menu.displayEndMenu(display);
         }
     }
 }

@@ -17,10 +17,13 @@ class BreakoutClass {
 
   public:
     // Constructor: Runs automatically when a class instance is created
-    int _paddleWidth = 15;
+    int _paddleWidth = 18;
     int _yPos = 54;
     int _xRangeMin;
     int _xRangeMax;
+    int _score = 0;
+    int _maxLives = 5;
+    int _numLives = _maxLives;
     const static int _MAX_COLUMNS = 24;
     const static int _MAX_BLOCK_ROWS = 5;
     const static int _MAX_BLOCK_COLUMNS = 30;
@@ -39,6 +42,7 @@ class BreakoutClass {
     int _topMargin = 4;
     int _botMargin = 8;
     int _sideMargin = 4;
+    int _spawnNewBoard = 1;
     int _numCols = (_display.width()-(2*_sideMargin))/(_blockWidth+1);
     int _numRows = 4;
     int _blockArr[_MAX_BLOCK_ROWS][_MAX_BLOCK_COLUMNS][2];
@@ -56,8 +60,13 @@ class BreakoutClass {
     void moveBall(Adafruit_SSD1306& display);
     void drawBall(Adafruit_SSD1306& display, int color);
     void createBoard(Adafruit_SSD1306& display);
-    void checkCollision(Adafruit_SSD1306& display);
+    void checkCollisions(Adafruit_SSD1306& display);
+    void checkPaddleCollision();
+    void checkBlockCollision(Adafruit_SSD1306& display);
     void drawBlock(Adafruit_SSD1306& display, int xPos, int yPos, int color);
+    void resetLaunch(Adafruit_SSD1306& display);
+    void displayScore(Adafruit_SSD1306& display);
+    void restartGame(Adafruit_SSD1306& display);
 };
 
 #endif
