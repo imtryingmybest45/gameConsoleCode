@@ -270,9 +270,11 @@ void loop(){
             pong._awayScore = 0;
             delay(500);
             startGameFlag = 1;
-            snake._spawnFlag = 1;
+            snake._spawnFlag = 0;
             snake._currentLength = snake._initialLength;
             breakout._launchBall = 0;
+            breakout._numLives = breakout._maxLives;
+            breakout._numBlocks = breakout._numRows*breakout._numCols;
             if (random(1,3) == 1){
                 breakout._ballXVel = 1;
             }

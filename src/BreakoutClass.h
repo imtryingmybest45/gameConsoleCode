@@ -42,10 +42,12 @@ class BreakoutClass {
     int _topMargin = 4;
     int _botMargin = 8;
     int _sideMargin = 4;
-    int _spawnNewBoard = 1;
+    //int _spawnNewBoard = 1;
+    int _spawnNewBoard = 0;
     int _numCols = (_display.width()-(2*_sideMargin))/(_blockWidth+1);
     int _numRows = 4;
     int _blockArr[_MAX_BLOCK_ROWS][_MAX_BLOCK_COLUMNS][2];
+    int _numBlocks = _numRows*_numCols;
 
 
 
