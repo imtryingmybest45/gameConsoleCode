@@ -195,11 +195,13 @@ void loop(){
        else if(breakoutMode == 1 && startGameFlag == 1){
             breakout.gameStartup(display);
             breakout.createBoard(display);
+            breakout.populateLives();
+            breakout.updateLives(display);
+            //breakout.resetLaunch(display);
             breakout.createPaddle(display);
             breakout.createBall(display);
             startGameFlag = 0;
        }
-       //else if (breakoutMode == 1 && startGameFlag == 0){
        else if (breakoutMode == 1){
             if (breakout._launchBall == 0){
                 breakout._launchBall = 1;
@@ -214,8 +216,12 @@ void loop(){
             }
         }
         else if(breakoutMode == 1){
-            //breakout.movePaddleLeft(display,2);
-            breakout.movePaddleLeft(display,3);
+            if (abs(breakout._ballXVel)==2){
+                breakout.movePaddleLeft(display,4);
+            }
+            else{
+                breakout.movePaddleLeft(display,3);
+            }
         }
     }
 
@@ -252,8 +258,12 @@ void loop(){
             }
         }
         else if(breakoutMode == 1){
-            //breakout.movePaddleRight(display,2);
-            breakout.movePaddleRight(display,3);
+            if (abs(breakout._ballXVel) == 2){
+                breakout.movePaddleRight(display,4);
+            }
+            else{
+                breakout.movePaddleRight(display,3);
+            }
         }
     }
 
@@ -284,6 +294,7 @@ void loop(){
             breakout._ballYVel = -1;
             breakout._xRangeMin = display.width()/2 - breakout._paddleWidth/2;
             breakout._xRangeMax = display.width()/2 + breakout._paddleWidth/2;
+            breakout.populateLives();
         }
         else{
             txtFuncs.drawCenteredText("Welcome to my gaming console.",display);
@@ -367,6 +378,7 @@ void loop(){
             startGameFlag = 1;
             breakout.displayScore(display);
             breakout.restartGame(display);
+            breakout.populateLives();
             menu.displayEndMenu(display);
         }
     }

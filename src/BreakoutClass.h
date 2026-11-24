@@ -22,7 +22,7 @@ class BreakoutClass {
     int _xRangeMin;
     int _xRangeMax;
     int _score = 0;
-    int _maxLives = 5;
+    const static int _maxLives = 5;
     int _numLives = _maxLives;
     const static int _MAX_COLUMNS = 24;
     const static int _MAX_BLOCK_ROWS = 5;
@@ -42,13 +42,11 @@ class BreakoutClass {
     int _topMargin = 4;
     int _botMargin = 8;
     int _sideMargin = 4;
-    //int _spawnNewBoard = 1;
-    int _spawnNewBoard = 0;
     int _numCols = (_display.width()-(2*_sideMargin))/(_blockWidth+1);
     int _numRows = 4;
     int _blockArr[_MAX_BLOCK_ROWS][_MAX_BLOCK_COLUMNS][2];
     int _numBlocks = _numRows*_numCols;
-
+    int _livesArr[_maxLives-1][2];
 
 
     BreakoutClass(Adafruit_SSD1306& display); 
@@ -69,6 +67,8 @@ class BreakoutClass {
     void resetLaunch(Adafruit_SSD1306& display);
     void displayScore(Adafruit_SSD1306& display);
     void restartGame(Adafruit_SSD1306& display);
+    void updateLives(Adafruit_SSD1306& display);
+    void populateLives();
 };
 
 #endif

@@ -87,25 +87,25 @@ void BreakoutClass::moveBall(Adafruit_SSD1306 &display){
         }
     }
 
-    /*for (int i = 0; i < _numRows; i++){
-        for (int j = 0; j < _numCols; j++){
-            if (_blockArr[i][j][0] != 1000 || _blockArr[i][j][1] != 1000){
-                _spawnNewBoard = 0;
-                break;
+    for (int j = 0; j < _numLives-1; j++){
+        for (int x = _livesArr[j][0]-1; x <= _livesArr[j][0]; x++){
+            for (int y = _livesArr[j][1]-1; y <= _livesArr[j][1]; y++){
+                if (display.getPixel(x,y) == 0){
+                    display.drawPixel(x,y,SSD1306_WHITE);
+                }
             }
         }
-    }*/
+    }
+
 
     if (_numBlocks == 0){
         if (_ballYPos > display.height()/2){
             createBoard(display);
             _score = _score + 10*(_numRows*_numCols);
-            //_spawnNewBoard = 0;
             _numBlocks = _numRows*_numCols;
         }
     }
 
-    //_spawnNewBoard = 1;
     display.display();
 }
 
@@ -228,6 +228,14 @@ void BreakoutClass::checkCollisions(Adafruit_SSD1306 &display){
     if (_ballYPos > display.height()){
         resetLaunch(display);
         _numLives--;
+        for (int x = _livesArr[_numLives-1][0]-1; x <= _livesArr[_numLives-1][0]; x++){
+            for (int y = _livesArr[_numLives-1][1]-1; y <= _livesArr[_numLives-1][1]; y++){
+                display.drawPixel(x, y, SSD1306_BLACK);
+            }
+        }
+        //_numLives--;
+        updateLives(display);
+        display.display();
     }
 }
 
@@ -240,7 +248,8 @@ void BreakoutClass::checkPaddleCollision(){
         left = _paddleWidth - 5*delt;
         inc = ceil(left/2);
         if (_ballXPos >= _paddlePos[0]-1 && _ballXPos <= _paddlePos[delt+inc-1]){
-            _ballXVel = -1;
+            //_ballXVel = -1;
+            _ballXVel = -2;
             _ballYVel = -2;
         }
         else if (_ballXPos >= _paddlePos[delt+inc] && _ballXPos <= _paddlePos[2*delt+inc-1]){
@@ -256,7 +265,8 @@ void BreakoutClass::checkPaddleCollision(){
             _ballYVel = -2;
         }
         else if (_ballXPos >= _paddlePos[4*delt+inc] && _ballXPos <= _paddlePos[_paddleWidth-1]+2){
-            _ballXVel = 1;
+            //_ballXVel = 1;
+            _ballXVel = 2;
             _ballYVel = -2;
         }
     }
@@ -358,4 +368,24 @@ void BreakoutClass::restartGame(Adafruit_SSD1306 & display){
     _launchBall = 0;
     _score = 0;
     _numBlocks = _numRows*_numCols;
+}
+
+void BreakoutClass::updateLives(Adafruit_SSD1306& display){
+    for (int j = 0; j < _numLives-1; j++){
+        for (int x = _livesArr[j][0]-1; x <= _livesArr[j][0]; x++){
+            for (int y = _livesArr[j][1]-1; y <= _livesArr[j][1]; y++){
+                display.drawPixel(x, y, SSD1306_WHITE);
+            }
+        }
+    }
+}
+
+void BreakoutClass::populateLives(){
+    int xPos = _sideMargin-1;
+    int yPos = _display.height() - 4;
+    for (int j = 0; j < _maxLives-1; j++){
+        _livesArr[j][0] = xPos;
+        _livesArr[j][1] = yPos;
+        yPos = yPos-5;
+    }
 }
