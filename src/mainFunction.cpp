@@ -197,7 +197,16 @@ void loop(){
             breakout.createBoard(display);
             breakout.populateLives();
             breakout.updateLives(display);
-            //breakout.resetLaunch(display);
+            breakout._xRangeMin = display.width()/2 - breakout._paddleWidth/2;
+            breakout._xRangeMax = display.width()/2 + breakout._paddleWidth/2;
+            breakout._launchBall = 0;
+            if (random(1,3) == 1){
+                breakout._ballXVel = 1;
+            }
+            else{
+                breakout._ballXVel = -1;
+            }
+            breakout._ballYVel = -1;
             breakout.createPaddle(display);
             breakout.createBall(display);
             startGameFlag = 0;

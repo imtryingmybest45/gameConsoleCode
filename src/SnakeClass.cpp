@@ -55,7 +55,11 @@ void SnakeClass::createSnake(Adafruit_SSD1306 &display){
             _wayPointInfo[i][j] = 0;
         }
     }
+
+    generateFoodPosition(display);
+
     display.display();
+    
 
 }
 
@@ -329,12 +333,6 @@ void SnakeClass::decrementSnake(int c){
 }
 
 void SnakeClass::spawnFood(Adafruit_SSD1306 &display){
-    int flag = 1;
-    int maxX; int maxY;
-    int minX; int minY;
-    int xPos; int yPos;
-    int xStart; int xEnd;
-    int yStart; int yEnd;
 
     if (_spawnFlag == 1){
         for (int i = 0; i < 2; i++){
@@ -343,35 +341,8 @@ void SnakeClass::spawnFood(Adafruit_SSD1306 &display){
             }
         }
 
-        xPos = random(3,display.width()-2);
-        yPos = random(3,display.height()-2);
+        generateFoodPosition(display);
 
-        xStart = _snakeInfo[0][0][0];
-        yStart = _snakeInfo[0][0][1];
-        xEnd = _snakeInfo[1][_currentLength-1][0];
-        yEnd = _snakeInfo[1][_currentLength-1][1];
-
-        minX = min(xStart,xEnd);
-        maxX = max(xStart,xEnd);
-        minY = min(yStart,yEnd);
-        maxY = max(yStart,yEnd);
-
-        while (flag == 1){
-            if ((xPos >= minX && xPos <= maxX+1)&&(yPos >= minY && yPos <= maxY+1)){
-                xPos = random(3,display.width()-3);
-                yPos = random(3,display.height()-3);
-            }
-            else{
-                flag = 0;
-            }
-        }
-
-        for (int i = 0; i < 2; i++){
-            for (int j = 0; j < 2; j++){
-                _foodPos[i][j][0] = xPos-j;
-                _foodPos[i][j][1] = yPos-i;
-            }
-        }
 
         for (int i = 0; i < 2; i++){
             for (int j = 0; j < 2; j++){
@@ -486,13 +457,15 @@ void SnakeClass::checkCollision(Adafruit_SSD1306 &display){
     }
 
     for (int i = 0; i < 2; i++){
-        if (_snakeInfo[i][0][0] > display.width()+1 || _snakeInfo[i][0][0] < -1){
-            _gameOver = 1;
-            break;
-        }
-        if (_snakeInfo[i][0][1] > display.height()+1 || _snakeInfo[i][0][1] < -1){
-            _gameOver = 1;
-            break;
+        for (int j = 0; j < 2; j++){ // Added xtra for loop to fix bug?, remove j and replace with 0 to change back
+            if (_snakeInfo[i][j][0] > display.width()+1 || _snakeInfo[i][j][0] < -1){
+                _gameOver = 1;
+                break;
+            }
+            if (_snakeInfo[i][j][1] > display.height()+1 || _snakeInfo[i][j][1] < -1){
+                _gameOver = 1;
+                break;
+            }
         }
     }
 }
@@ -528,6 +501,38 @@ void SnakeClass::findNumWayPoints(){
         if (_wayPointInfo[2][i] == _wayPointInfo[3][i]){
             _numWayPoints = i;
             break;
+        }
+    }
+}
+
+void SnakeClass::generateFoodPosition(Adafruit_SSD1306 &display){
+    int flag = 1;
+    int xPos; int yPos;
+
+    xPos = random(3,display.width()-2);
+    yPos = random(3,display.height()-2);
+
+    while (flag == 1){
+        for (int i = 0; i < 2; i++){
+            for (int j = 0; j < _currentLength; j++){
+                if (xPos == _snakeInfo[i][j][0] && yPos == _snakeInfo[i][j][1]){
+                    flag = 1;
+                    xPos = random(3,display.width()-2);
+                    yPos = random(3,display.height()-2);
+                    Serial.println("recalculating");
+                    break;
+                }
+                else{
+                    flag = 0;
+                }
+            }
+        }
+    }
+
+    for (int i = 0; i < 2; i++){
+        for (int j = 0; j < 2; j++){
+            _foodPos[i][j][0] = xPos-j;
+            _foodPos[i][j][1] = yPos-i;
         }
     }
 }

@@ -212,31 +212,36 @@ void BreakoutClass::drawBlock(Adafruit_SSD1306 &display, int xPos, int yPos, int
 }
 
 void BreakoutClass::checkCollisions(Adafruit_SSD1306 &display){
-    if (_ballXPos == 3 || _ballXPos + 1 == 3){
-        _ballXVel = 1;
-    }
-    else if (_ballXPos == display.width()-2 || _ballXPos+1 == display.width()-2){
-        _ballXVel = -1;
-    }
-    if (_ballYPos == 3 || _ballYPos-1 == 3){
-        _ballYVel = 2;
-    }
 
-    checkPaddleCollision();
-    checkBlockCollision(display);
-
-    if (_ballYPos > display.height()){
-        resetLaunch(display);
+    if (_ballYPos > display.height() || _ballXPos < 0 || _ballXPos > display.width()+1){
         _numLives--;
+        if (_numLives > 0){
+            resetLaunch(display);
+        }
         for (int x = _livesArr[_numLives-1][0]-1; x <= _livesArr[_numLives-1][0]; x++){
             for (int y = _livesArr[_numLives-1][1]-1; y <= _livesArr[_numLives-1][1]; y++){
                 display.drawPixel(x, y, SSD1306_BLACK);
             }
         }
-        //_numLives--;
         updateLives(display);
         display.display();
     }
+
+
+    if (_ballXPos <= 3){
+        _ballXVel = 1;
+    }
+
+    else if (_ballXPos >= display.width()-2){
+        _ballXVel = -1;
+    }
+
+    if (_ballYPos <= 3){
+        _ballYVel = 2;
+    }
+
+    checkPaddleCollision();
+    checkBlockCollision(display);
 }
 
 void BreakoutClass::checkPaddleCollision(){
@@ -248,7 +253,6 @@ void BreakoutClass::checkPaddleCollision(){
         left = _paddleWidth - 5*delt;
         inc = ceil(left/2);
         if (_ballXPos >= _paddlePos[0]-1 && _ballXPos <= _paddlePos[delt+inc-1]){
-            //_ballXVel = -1;
             _ballXVel = -2;
             _ballYVel = -2;
         }
@@ -265,7 +269,6 @@ void BreakoutClass::checkPaddleCollision(){
             _ballYVel = -2;
         }
         else if (_ballXPos >= _paddlePos[4*delt+inc] && _ballXPos <= _paddlePos[_paddleWidth-1]+2){
-            //_ballXVel = 1;
             _ballXVel = 2;
             _ballYVel = -2;
         }
@@ -273,48 +276,50 @@ void BreakoutClass::checkPaddleCollision(){
 }
 
 void BreakoutClass::checkBlockCollision(Adafruit_SSD1306& display){
+    int flag = 0;
     for (int i = _numRows; i >= 0; i--){
         for (int j = 0; j < _numCols; j++){
-            if (_ballXPos >= _blockArr[i][j][0] && _ballXPos <= _blockArr[i][j][0]+_blockWidth){
-                if (_ballYPos <= _blockArr[i][j][1]+1 && _ballYPos >= _blockArr[i][j][1]-1){
+            if (_ballXPos >= _blockArr[i][j][0] && _ballXPos <= _blockArr[i][j][0]+_blockWidth){ // second & third iteration
+                if (_ballYPos <= _blockArr[i][j][1]+1 && _ballYPos >= _blockArr[i][j][1]-1){ // first & second iteration
                     _ballYVel = -2;
                     if (display.getPixel(_blockArr[i][j][0],_blockArr[i][j][1])==1){
                         _numBlocks--;
                     }
                     drawBlock(display,_blockArr[i][j][0],_blockArr[i][j][1],0);
-                    _blockArr[i][j][0] = 1000;
-                    _blockArr[i][j][1] = 1000;
+                    flag = 1;
                 }
-                else if (_ballYPos <= _blockArr[i][j][1]+_blockHeight+1 && _ballYPos >= _blockArr[i][j][1]+_blockHeight){
+                else if (_ballYPos <= _blockArr[i][j][1]+_blockHeight+1 && _ballYPos >= _blockArr[i][j][1]+_blockHeight-1){ // second iteration
                     _ballYVel = 2;
                     if (display.getPixel(_blockArr[i][j][0],_blockArr[i][j][1])==1){
                         _numBlocks--;
                     }
                     drawBlock(display,_blockArr[i][j][0],_blockArr[i][j][1],0);
-                    _blockArr[i][j][0] = 1000;
-                    _blockArr[i][j][1] = 1000;
+                    flag = 1;
                 }
             }
 
-            if (_ballYPos <= _blockArr[i][j][1]+_blockHeight && _ballYPos >= _blockArr[i][j][1]){
+            if (_ballYPos <= _blockArr[i][j][1]+_blockHeight && _ballYPos >= _blockArr[i][j][1]){ // third iteration
                 if (_ballXPos >= _blockArr[i][j][0]-1 && _ballXPos <= _blockArr[i][j][0]+1){
                     _ballXVel = -1;
                     if (display.getPixel(_blockArr[i][j][0],_blockArr[i][j][1])==1){
                         _numBlocks--;
                     }
                     drawBlock(display,_blockArr[i][j][0],_blockArr[i][j][1],0);
-                    _blockArr[i][j][0] = 1000;
-                    _blockArr[i][j][1] = 1000;
+                    flag = 1;
                 }
-                else if (_ballXPos-1 <= _blockArr[i][j][0]+_blockWidth && _ballXPos-1 >= _blockArr[i][j][0]+_blockWidth-2){
+                else if (_ballXPos-1 <= _blockArr[i][j][0]+_blockWidth && _ballXPos-1 >= _blockArr[i][j][0]+_blockWidth-3){ // second iteration
                     _ballXVel = 1;
                     if (display.getPixel(_blockArr[i][j][0],_blockArr[i][j][1])==1){
                         _numBlocks--;
                     }
                     drawBlock(display,_blockArr[i][j][0],_blockArr[i][j][1],0);
-                    _blockArr[i][j][0] = 1000;
-                    _blockArr[i][j][1] = 1000;
+                    flag = 1;
                 }
+            }
+            if (flag == 1){
+                _blockArr[i][j][0] = 1000;
+                _blockArr[i][j][1] = 1000;
+                flag = 0;
             }
 
         }
@@ -336,7 +341,7 @@ void BreakoutClass::resetLaunch(Adafruit_SSD1306& display){
     }
     _ballYVel = -1;
     createPaddle(display);
-    createBall(display);
+    createBall(display); 
 }
 
 void BreakoutClass::displayScore(Adafruit_SSD1306 &display){

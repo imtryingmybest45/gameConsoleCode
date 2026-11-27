@@ -33,6 +33,7 @@ class SnakeClass {
     int _numWayPoints = 0;
     int _foodPos[2][2][2];
 
+
     SnakeClass(Adafruit_SSD1306& display); 
 
     void gameStartup(Adafruit_SSD1306& display);
@@ -51,6 +52,7 @@ class SnakeClass {
     void restartGame(Adafruit_SSD1306 &display);
     void displayScore(Adafruit_SSD1306 &display);
     void findNumWayPoints();
+   void generateFoodPosition(Adafruit_SSD1306 &display);
 }; 
 
 #endif
